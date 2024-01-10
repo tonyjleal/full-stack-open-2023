@@ -1,4 +1,5 @@
 import {Title} from './Title';
+import {StatisticLine} from './StatisticLine';
 
 export const Statistics = ({good, neutral, bad}) => {
 
@@ -16,12 +17,13 @@ export const Statistics = ({good, neutral, bad}) => {
     return (
       <>
           <Title title="statistics"></Title>
-          <div>good {good}</div>
-          <div>neutral {neutral}</div>
-          <div>bad {bad}</div>
-          <div>all {all}</div>
-          <div>average {(good - bad) / all}</div>
-          <div>positive {(good / all) * 100}  %</div>
+          
+          <StatisticLine text="good" value={good}></StatisticLine> 
+          <StatisticLine text="neutral" value={neutral}></StatisticLine> 
+          <StatisticLine text="bad" value={bad}></StatisticLine> 
+          <StatisticLine text="all" value={all}></StatisticLine> 
+          <StatisticLine text="average" value={(good - bad) / all}></StatisticLine> 
+          <StatisticLine text="positive" value={`${(good / all) * 100}%`}></StatisticLine>
       </>
     )
   

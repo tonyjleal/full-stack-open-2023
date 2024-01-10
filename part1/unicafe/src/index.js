@@ -5,8 +5,8 @@ import reportWebVitals from './reportWebVitals';
 import { useState } from 'react';
 import {Title} from './components/Title';
 import {Statistics} from './components/Statistics';
+import {Button} from './components/Button';
 
-const Button = ({text, handleClick}) => <button onClick={handleClick}>{text}</button>
 
 const App = () => {
   // save clicks of each button to its own state
