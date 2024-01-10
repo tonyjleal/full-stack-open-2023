@@ -3,37 +3,10 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import { useState } from 'react';
+import {Title} from './components/Title';
+import {Statistics} from './components/Statistics';
 
 const Button = ({text, handleClick}) => <button onClick={handleClick}>{text}</button>
-
-const Title = ({title}) => <h1>{title}</h1>
-
-const Statistics = ({good, neutral, bad}) => {
-
-  const all = good + neutral + bad;
-
-  if(all === 0) {
-    return (
-      <>
-          <Title title="statistics"></Title>
-          <p>No feedback given yet</p>
-      </>      
-    )
-  }
-  
-  return (
-    <>
-        <Title title="statistics"></Title>
-        <div>good {good}</div>
-        <div>neutral {neutral}</div>
-        <div>bad {bad}</div>
-        <div>all {all}</div>
-        <div>average {(good - bad) / all}</div>
-        <div>positive {(good / all) * 100}  %</div>
-    </>
-  )
-
-}
 
 const App = () => {
   // save clicks of each button to its own state
@@ -56,7 +29,7 @@ const App = () => {
 
   return (
     <>
-      <h1>give feedback</h1>
+      <Title title="give feedback"></Title>
       <Button handleClick={handleGood} text="good" />
       <Button handleClick={handleNeutral} text="neutral" />
       <Button handleClick={handleBad} text="bad" />
