@@ -4,7 +4,14 @@ export const Statistics = ({good, neutral, bad}) => {
 
     const all = good + neutral + bad;
   
-
+    if(all === 0) {
+      return (
+        <>
+            <Title title="statistics"></Title>
+            <p>No feedback given</p>
+        </>      
+      )
+    }
     
     return (
       <>
