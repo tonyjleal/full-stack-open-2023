@@ -1,2 +1,2 @@
 
-export const StatisticLine = ({text, value}) =>  <div>{text} {value}</div>
+export const StatisticLine = ({text, value}) =>  <tr><td>{text}</td><td>{value}</td></tr>
