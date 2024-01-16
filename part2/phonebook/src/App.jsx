@@ -1,7 +1,14 @@
 import React, { useState } from 'react'
 
 const App = () => {
-  const [ persons, setPersons ] = useState([]) 
+  const [ persons, setPersons ] = useState([
+    { name: 'Arto Hellas', number: '040-123456' },
+    { name: 'Ada Lovelace', number: '39-44-5323523' },
+    { name: 'Dan Abramov', number: '12-43-234345' },
+    { name: 'Mary Poppendieck', number: '39-23-6423122' }
+  ]) 
+  const [personsToShow, setPersonsToShow ] = useState(persons)
+  const [ filterName, setFilterName] = useState('')
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
 
@@ -12,6 +19,12 @@ const App = () => {
 
   const handleNewNumber = (event) => {
     setNewNumber(event.target.value)
+  }
+
+  const handleFilterName = (event) => {
+    const search = event.target.value
+    setFilterName(search)
+    setPersonsToShow(persons.filter(person => person.name.toLowerCase().includes(search.toLowerCase())))
   }
 
   const handleAddPerson = (event) => {
@@ -36,9 +49,16 @@ const App = () => {
   }
 
 
+
   return (
     <div>
       <h2>Phonebook</h2>
+
+      <div>
+        filter shown with <input type="text" value={filterName} onChange={handleFilterName} />
+      </div>
+
+      <h2>add a new</h2>
       <form onSubmit={handleAddPerson}>
         <div>
           name: <input value={newName} onChange={handleNewName}/>
@@ -53,7 +73,7 @@ const App = () => {
       <h2>Numbers</h2>
       <div>
           {
-            persons.map(
+            personsToShow.map(
               person  => <div key={person.name}>{person.name} {person.number}</div> 
             )
           }
