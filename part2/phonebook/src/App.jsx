@@ -34,6 +34,18 @@ const App = () => {
     setPersonsToShow(persons.filter(person => person.name.toLowerCase().includes(search.toLowerCase())))
   }
 
+
+  const handleDeletePerson = (id, name) => {
+    if(confirm(`Delete ${name}?`)) {
+      personsService.remove(id)
+      .then(returnedValue => {
+        const copyPersons = persons.filter(p => p.id !== returnedValue.id);
+        setPersons(copyPersons)
+        setPersonsToShow(copyPersons.filter(person => person.name.toLowerCase().includes(filterName.toLowerCase())))
+      })
+    }
+  }
+
   const handleAddPerson = (event) => {
     event.preventDefault()
 
@@ -78,7 +90,7 @@ const App = () => {
 
 
       <h2>Numbers</h2>
-      <Persons persons={personsToShow} />
+      <Persons persons={personsToShow} handlerDeletePerson={handleDeletePerson} />
             
           
     </div>
