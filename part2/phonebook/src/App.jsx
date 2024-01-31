@@ -50,9 +50,15 @@ const App = () => {
       name: newName,
       number: newNumber
     }
-    const copyPersons = persons.concat(newPerson);
-    setPersons(copyPersons)
-    setPersonsToShow(copyPersons.filter(person => person.name.toLowerCase().includes(filterName.toLowerCase())))
+
+    axios.post('http://localhost:3001/persons', newPerson)
+          .then(response => {
+            const copyPersons = persons.concat(response.data);
+            setPersons(copyPersons)
+            setPersonsToShow(copyPersons.filter(person => person.name.toLowerCase().includes(filterName.toLowerCase())))
+          })
+
+
     setNewName('')
     setNewNumber('')
   }
