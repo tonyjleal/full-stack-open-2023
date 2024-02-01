@@ -20,6 +20,11 @@ const App = () => {
                   })
   }, [])
 
+  useEffect(() => {
+    const filteredPersons = persons.filter(person => person.name.toLowerCase().includes(filterName.toLowerCase()));
+    setPersonsToShow(filteredPersons);
+  }, [persons])
+
   const handleNewName = (event) => {
     setNewName(event.target.value)
   }
@@ -41,7 +46,6 @@ const App = () => {
       .then(returnedValue => {
         const copyPersons = persons.filter(p => p.id !== returnedValue.id);
         setPersons(copyPersons)
-        setPersonsToShow(copyPersons.filter(person => person.name.toLowerCase().includes(filterName.toLowerCase())))
       })
     }
   }
@@ -53,22 +57,31 @@ const App = () => {
       return false;
     }
 
-    if(persons.find(person => person.name === newName)) {
-      alert(`${newName} is already added to phonebook`)
-      return false;
-    }
-
     const newPerson = {
       name: newName,
       number: newNumber
     }
+    const person = persons.find(person => person.name === newName)
+    if(!person) {
+      personsService.create(newPerson)
+      .then(returnedValue => {
+        setPersons(prevPerson => [...prevPerson, returnedValue])                  
+      }).catch(error => {
+        console.error(error)
+        alert(`An error are created while trying to create the new person: ${newPerson}.`)        
+      })
+      
+    } else if(confirm(`${person.name} is already added to phonebook, replace the old number with a new one?`)){
 
-    personsService.create(newPerson)
-                  .then(returnedValue => {
-                    const copyPersons = persons.concat(returnedValue);
-                    setPersons(copyPersons)
-                    setPersonsToShow(copyPersons.filter(person => person.name.toLowerCase().includes(filterName.toLowerCase())))                    
-                  })
+      const changedPerson = {...person, number: newNumber}
+      personsService.update(person.id, changedPerson)
+      .then( returnedValue => {
+        setPersons(persons.map(p => person.id === p.id ? { ...p, ...returnedValue } : p))  
+      }).catch(error => {
+        console.error(error)
+        alert(`An error are created while trying to update person: ${newPerson}.`)        
+      })
+    }    
     setNewName('')
     setNewNumber('')
   }
