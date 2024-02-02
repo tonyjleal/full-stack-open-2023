@@ -10,7 +10,7 @@ const App = () => {
   const [personsToShow, setPersonsToShow ] = useState([])
   const [filterName, setFilterName] = useState('')
   const [newPerson, setNewPerson] = useState({name: '', number: ''})
-  const [message, setMessage] = useState(null)
+  const [notification, setNotification] = useState({type: '', message:''})
 
   useEffect(() => {
     personsService.getAll()
@@ -44,8 +44,14 @@ const App = () => {
       personsService.remove(id)
       .then(returnedValue => {
         setPersons(persons.filter(p => p.id !== returnedValue.id))
-        setMessage(`Deleted successfully`)
-      })
+        setNotification(`Deleted successfully`)
+      }).catch( error => {
+        if (error.response && error.response.status === 404) {
+          setNotification({type: 'error', message: `Information of ${name} has already been removed from server.`})
+        }
+      
+      }
+      )
     }
   }
 
@@ -61,10 +67,9 @@ const App = () => {
       personsService.create(newPerson)
       .then(returnedValue => {
         setPersons(prevPerson => [...prevPerson, returnedValue])
-        setMessage(`Added ${returnedValue.name}`)
+        setNotification({type: 'success', message:`Added ${returnedValue.name}`})
       }).catch(error => {
-        console.error(error)
-        alert(`An error are created while trying to create the new person: ${newPerson}.`)        
+        setNotification({type: 'error', message: `An error are created while trying to create the new person: ${newPerson}.`})
       })
       
     } else if(confirm(`${person.name} is already added to phonebook, replace the old number with a new one?`)){
@@ -73,10 +78,9 @@ const App = () => {
       personsService.update(person.id, changedPerson)
       .then( returnedValue => {
         setPersons(persons.map(p => person.id === p.id ? { ...p, ...returnedValue } : p))  
-        setMessage(`Updated ${returnedValue.name}`)
+        setNotification({type: 'success', message:`Updated ${returnedValue.name}`})
       }).catch(error => {
-        console.error(error)
-        alert(`An error are created while trying to update person: ${newPerson}.`)        
+        setNotification({type: 'success', message: `An error are created while trying to update person: ${newPerson}.`})
       })
     }    
     setNewPerson({name:'', number:''})
@@ -86,7 +90,7 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
 
-      <Notification message={message} />
+      <Notification notification={notification} />
 
       <Filter text={filterName} handleFilterName={handleFilterName} />
 
