@@ -3,20 +3,19 @@ import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import personsService from './service/persons'
+import Notification from './components/Notification'
 
 const App = () => {
   const [persons, setPersons ] = useState([]) 
   const [personsToShow, setPersonsToShow ] = useState([])
-  const [ filterName, setFilterName] = useState('')
-  const [ newName, setNewName ] = useState('')
-  const [ newNumber, setNewNumber ] = useState('')
-
+  const [filterName, setFilterName] = useState('')
+  const [newPerson, setNewPerson] = useState({name: '', number: ''})
+  const [message, setMessage] = useState(null)
 
   useEffect(() => {
     personsService.getAll()
                   .then( initialValue => {
                     setPersons(initialValue)        
-                    setPersonsToShow(initialValue)
                   })
   }, [])
 
@@ -25,12 +24,12 @@ const App = () => {
     setPersonsToShow(filteredPersons);
   }, [persons])
 
-  const handleNewName = (event) => {
-    setNewName(event.target.value)
+  const handleNewName = (event) => { 
+    setNewPerson({...newPerson, name: event.target.value})
   }
 
   const handleNewNumber = (event) => {
-    setNewNumber(event.target.value)
+    setNewPerson({...newPerson, number: event.target.value})
   }
 
   const handleFilterName = (event) => {
@@ -44,8 +43,8 @@ const App = () => {
     if(confirm(`Delete ${name}?`)) {
       personsService.remove(id)
       .then(returnedValue => {
-        const copyPersons = persons.filter(p => p.id !== returnedValue.id);
-        setPersons(copyPersons)
+        setPersons(persons.filter(p => p.id !== returnedValue.id))
+        setMessage(`Deleted successfully`)
       })
     }
   }
@@ -53,19 +52,16 @@ const App = () => {
   const handleAddPerson = (event) => {
     event.preventDefault()
 
-    if(newName === ''){
+    if(newPerson.name === ''){
       return false;
     }
 
-    const newPerson = {
-      name: newName,
-      number: newNumber
-    }
-    const person = persons.find(person => person.name === newName)
+    const person = persons.find(person => person.name === newPerson.name)
     if(!person) {
       personsService.create(newPerson)
       .then(returnedValue => {
-        setPersons(prevPerson => [...prevPerson, returnedValue])                  
+        setPersons(prevPerson => [...prevPerson, returnedValue])
+        setMessage(`Added ${returnedValue.name}`)
       }).catch(error => {
         console.error(error)
         alert(`An error are created while trying to create the new person: ${newPerson}.`)        
@@ -73,31 +69,31 @@ const App = () => {
       
     } else if(confirm(`${person.name} is already added to phonebook, replace the old number with a new one?`)){
 
-      const changedPerson = {...person, number: newNumber}
+      const changedPerson = {...person, number: newPerson.number}
       personsService.update(person.id, changedPerson)
       .then( returnedValue => {
         setPersons(persons.map(p => person.id === p.id ? { ...p, ...returnedValue } : p))  
+        setMessage(`Updated ${returnedValue.name}`)
       }).catch(error => {
         console.error(error)
         alert(`An error are created while trying to update person: ${newPerson}.`)        
       })
     }    
-    setNewName('')
-    setNewNumber('')
+    setNewPerson({name:'', number:''})
   }
-
-
 
   return (
     <div>
       <h2>Phonebook</h2>
+
+      <Notification message={message} />
+
       <Filter text={filterName} handleFilterName={handleFilterName} />
 
       <h2>add a new</h2>
       <PersonForm 
         methodAdd={handleAddPerson} 
-        newNumber={newNumber}
-        newName={newName}
+        newPerson={newPerson}
         handleNewName={handleNewName} 
         handleNewNumber={handleNewNumber}/>
 
