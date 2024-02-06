@@ -1,6 +1,6 @@
 import Country from "./Country"
 
-const Countries = ({countries}) => {
+const Countries = ({countries, setCountriesToShow}) => {
 
     if (!countries) return null
 
@@ -12,7 +12,10 @@ const Countries = ({countries}) => {
     return  (
         <>
             {
-                countries.map(country => <div key={country.name.common}>{country.name.common}</div>)
+                countries.map(country => 
+                                <div key={country.name.common}>
+                                    {country.name.common} <button onClick={() => setCountriesToShow([country])}>show</button>
+                                </div>)
             }
         </>
     )

@@ -5,7 +5,8 @@ const Country = ({country}) => {
     const flagStyle = {
         borderColor: '#ddd', 
         borderWidth: 1,
-        borderStyle: 'solid'
+        borderStyle: 'solid',
+        height: 150
     }
 
     return (
@@ -24,7 +25,7 @@ const Country = ({country}) => {
             <p><strong>languages:</strong></p>
             <Languages languages={country.languages} />
 
-            <img src={country.flags.png} alt={country.flags.alt} height={150} style={flagStyle}/>
+            <img src={country.flags.png} alt={country.flags.alt} style={flagStyle}/>
         </>
     )
 

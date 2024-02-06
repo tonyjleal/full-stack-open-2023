@@ -25,7 +25,7 @@ function App() {
   return (
     <>  
       find countries <input type="text" onChange={handleSearch}/>
-      <Countries countries={countriesToShow}/> 
+      <Countries countries={countriesToShow} setCountriesToShow={setCountriesToShow}/> 
     </>
   )
 }
