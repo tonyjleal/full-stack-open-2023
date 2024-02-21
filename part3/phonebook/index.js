@@ -45,14 +45,21 @@ app.get('/api/persons/:id', (request, response) => {
 
 app.post('/api/persons', (request, response) => {
     const body = request.body
-  console.log(body)
-    if(!body.name) {
+
+    const emptyField = _validateParams(body);
+    if(emptyField) {
       return response.status(400).json({
-        error: 'content missing'
+        error: emptyField
       })
     }
-console.log(body)
-console.log(body.name, body.number)
+
+    const existName = persons.some(p => p.name.toLowerCase() === body.name.toLowerCase())
+    if(existName) {
+      return response.status(400).json({
+        error: 'name must be unique'
+      })
+    }
+
     const person = {
       id: _generateId(),
       name: body.name,
@@ -79,6 +86,19 @@ app.get('/info', (request, response) => {
   response.send(infoMessage)
 })
 
+const _validateParams = (body) => {
+  let emptyField = ''
+    
+  if(!body.name && !body.number) {
+    emptyField = 'name and number is missing'
+  } else if(!body.name) {
+    emptyField = 'name is missing'
+  } else if(!body.number) {
+    emptyField = 'number is missing'
+  }
+
+  return emptyField
+}
 
 const _generateId = () => {
   const maxId = persons.length > 0  
