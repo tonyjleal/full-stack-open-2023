@@ -2,9 +2,16 @@ const express = require('express')
 const morgan = require('morgan')
 const app = express()
 
-
 app.use(express.json())
-app.use(morgan('tiny'))
+
+morgan.token('body', (req, _) =>  JSON.stringify(req.body))
+
+app.use((req, res, next) => {
+  const format = req.method === 'POST' 
+                  ? ':method :url :status :res[content-length] - :response-time ms :body' 
+                  : 'tiny'
+  morgan(format)(req, res, next)
+})
 
 
 let persons = [
@@ -31,7 +38,7 @@ let persons = [
 ]
 
 
-app.get('/api/persons', (request, response) => {
+app.get('/api/persons', (_, response) => {
   response.json(persons)
 })
 
@@ -82,7 +89,7 @@ app.delete('/api/persons/:id', (request, response) => {
   response.status(204).end()
 })
 
-app.get('/info', (request, response) => {
+app.get('/info', (_, response) => {
   const infoMessage = `
                   <p>Phonebook has info for ${persons.length} people</p>
                   <p>${new Date()}</p>
