@@ -1,9 +1,10 @@
 const express = require('express')
 const morgan = require('morgan')
 const app = express()
+const cors = require('cors')
 
 app.use(express.json())
-
+app.use(cors())
 morgan.token('body', (req, _) =>  JSON.stringify(req.body))
 
 app.use((req, res, next) => {
@@ -14,6 +15,7 @@ app.use((req, res, next) => {
 })
 
 
+const baseUrl = '/api/persons'
 let persons = [
     { 
       "id": 1,
@@ -38,11 +40,11 @@ let persons = [
 ]
 
 
-app.get('/api/persons', (_, response) => {
+app.get(`${baseUrl}`, (_, response) => {
   response.json(persons)
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get(`${baseUrl}/:id`, (request, response) => {
   const id = Number(request.params.id)
   const person = persons.find(person => person.id === id)
   
@@ -54,7 +56,7 @@ app.get('/api/persons/:id', (request, response) => {
 
 })
 
-app.post('/api/persons', (request, response) => {
+app.post(`${baseUrl}`, (request, response) => {
     const body = request.body
 
     const emptyField = _validateParams(body);
@@ -82,7 +84,7 @@ app.post('/api/persons', (request, response) => {
     response.json(person)
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete(`${baseUrl}/:id`, (request, response) => {
   const id = Number(request.params.id)
   persons = persons.filter(person => person.id !== id);
   
@@ -119,7 +121,7 @@ const _generateId = () => {
 }
 
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })

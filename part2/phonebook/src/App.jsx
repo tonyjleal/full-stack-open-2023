@@ -42,16 +42,15 @@ const App = () => {
   const handleDeletePerson = (id, name) => {
     if(confirm(`Delete ${name}?`)) {
       personsService.remove(id)
-      .then(returnedValue => {
-        setPersons(persons.filter(p => p.id !== returnedValue.id))
-        setNotification(`Deleted successfully`)
+      .then((_) => {
+        setPersons(persons.filter(p => p.id !== id))
+        setNotification({type:'success', message: 'Deleted successfully'})
       }).catch( error => {
         if (error.response && error.response.status === 404) {
           setNotification({type: 'error', message: `Information of ${name} has already been removed from server.`})
         }
       
-      }
-      )
+      })
     }
   }
 
