@@ -19,8 +19,6 @@ app.use((req, res, next) => {
 
 
 const baseUrl = '/api/persons'
-let persons = [];
-
 
 app.get(`${baseUrl}`, (_, response) => {
   Person.find({}).then(persons => {
@@ -29,14 +27,12 @@ app.get(`${baseUrl}`, (_, response) => {
 })
 
 app.get(`${baseUrl}/:id`, (request, response) => {
-  const id = Number(request.params.id)
-  const person = persons.find(person => person.id === id)
+  Person.findById(request.params.id)
+  .then(person => {
+      response.json(person)
+  }).catch(response.status(404).end())
   
-  if(person) {
-    response.json(person)
-  }  else {
-    response.status(404).end()
-  }
+
 
 })
 
@@ -50,29 +46,28 @@ app.post(`${baseUrl}`, (request, response) => {
       })
     }
 
-    const existName = persons.some(p => p.name.toLowerCase() === body.name.toLowerCase())
-    if(existName) {
-      return response.status(400).json({
-        error: 'name must be unique'
-      })
-    }
-
-    const person = {
-      id: _generateId(),
+    const person = new Person({
       name: body.name,
       number: body.number
-    }
+    })
 
-    persons = persons.concat(person)
+    person.save().then(savedPerson => {
+      response.json(savedPerson)
+    })
 
-    response.json(person)
 })
 
 app.delete(`${baseUrl}/:id`, (request, response) => {
-  const id = Number(request.params.id)
-  persons = persons.filter(person => person.id !== id);
+  const person = Person.findById(request.params.id)
   
-  response.status(204).end()
+  Person.deleteOne(person)
+  .then(deletedPerson => {
+    if(deletedPerson.deletedCount > 0 ) {
+      response.status(204).end()
+    } else {
+      console.log(`No persons matched the query. Delete 0 persons.`)
+    }
+  })
 })
 
 app.get('/info', (_, response) => {
@@ -96,14 +91,6 @@ const _validateParams = (body) => {
 
   return emptyField
 }
-
-const _generateId = () => {
-  const maxId = persons.length > 0  
-                ? Math.max(...persons.map(p => p.id))
-                : 0
-  return maxId + 1
-}
-
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
