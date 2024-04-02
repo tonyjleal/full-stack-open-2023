@@ -20,23 +20,24 @@ app.use((req, res, next) => {
 
 const baseUrl = '/api/persons'
 
-app.get(`${baseUrl}`, (_, response) => {
-  Person.find({}).then(persons => {
+app.get(`${baseUrl}`, (_, response, next) => {
+  Person.find({})
+  .then(persons => {
     response.json(persons)
   })
+  .catch(error => next(error))
+
 })
 
-app.get(`${baseUrl}/:id`, (request, response) => {
+app.get(`${baseUrl}/:id`, (request, response, next) => {
   Person.findById(request.params.id)
   .then(person => {
       response.json(person)
-  }).catch(response.status(404).end())
-  
-
-
+  })
+  .catch(error => next(error))
 })
 
-app.post(`${baseUrl}`, (request, response) => {
+app.post(`${baseUrl}`, (request, response, next) => {
     const body = request.body
 
     const emptyField = _validateParams(body);
@@ -51,32 +52,54 @@ app.post(`${baseUrl}`, (request, response) => {
       number: body.number
     })
 
-    person.save().then(savedPerson => {
+    person.save()
+    .then(savedPerson => {
       response.json(savedPerson)
     })
+    .catch(error => next(error))
 
 })
 
-app.delete(`${baseUrl}/:id`, (request, response) => {
-  const person = Person.findById(request.params.id)
+app.delete(`${baseUrl}/:id`, (request, response, next) => {
   
-  Person.deleteOne(person)
+  Person.findByIdAndDelete(request.params.id)
   .then(deletedPerson => {
-    if(deletedPerson.deletedCount > 0 ) {
       response.status(204).end()
-    } else {
-      console.log(`No persons matched the query. Delete 0 persons.`)
-    }
   })
+  .catch(error => next(error))
 })
 
-app.get('/info', (_, response) => {
-  const infoMessage = `
-                  <p>Phonebook has info for ${persons.length} people</p>
-                  <p>${new Date()}</p>
-                  `
-  response.send(infoMessage)
+app.get('/info', (_, response, next) => {
+  Person.find({})
+  .then((people) => {    
+    response.send(`
+      <p>Phonebook has info for ${people.length} people</p>
+      <p>${new Date()}</p>
+      `)
+  })
+  .catch(error => next(error))
 })
+
+
+const unknownEndpoint = (_, response) => {
+  response.status(404).send({ error: "unknown endpoint" });
+};
+
+app.use(unknownEndpoint);
+
+const errorHandler = (error, _, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } 
+
+  next(error)
+}
+
+
+app.use(errorHandler)
+
 
 const _validateParams = (body) => {
   let emptyField = ''
