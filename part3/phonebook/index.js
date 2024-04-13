@@ -60,10 +60,22 @@ app.post(`${baseUrl}`, (request, response, next) => {
 
 })
 
+app.put(`${baseUrl}/:id`, (request, response, next) => {
+
+  const {id, name, number} = request.body
+  
+  Person.findByIdAndUpdate(id, {name, number}, { new:true })
+  .then(savedPerson => {
+    response.json(savedPerson)
+  })
+  .catch(error => next(error))
+
+})
+
 app.delete(`${baseUrl}/:id`, (request, response, next) => {
   
   Person.findByIdAndDelete(request.params.id)
-  .then(deletedPerson => {
+  .then(_ => {
       response.status(204).end()
   })
   .catch(error => next(error))
