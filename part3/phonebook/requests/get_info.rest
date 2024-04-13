@@ -1,0 +1,3 @@
+
+GET http://localhost:3001/info
+#GET https://phonebook-tvo8.onrender.com/info
