@@ -57,10 +57,6 @@ const App = () => {
   const handleAddPerson = (event) => {
     event.preventDefault()
 
-    if(newPerson.name === ''){
-      return false;
-    }
-
     const person = persons.find(person => person.name === newPerson.name)
     if(!person) {
       personsService.create(newPerson)
@@ -68,7 +64,7 @@ const App = () => {
         setPersons(prevPerson => [...prevPerson, returnedValue])
         setNotification({type: 'success', message:`Added ${returnedValue.name}`})
       }).catch(error => {
-        setNotification({type: 'error', message: `An error are created while trying to create the new person: ${newPerson}.`})
+        setNotification({type: 'error', message: error.response.data.error })
       })
       
     } else if(confirm(`${person.name} is already added to phonebook, replace the old number with a new one?`)){
@@ -79,7 +75,7 @@ const App = () => {
         setPersons(persons.map(p => person.id === p.id ? { ...p, ...returnedValue } : p))  
         setNotification({type: 'success', message:`Updated ${returnedValue.name}`})
       }).catch(error => {
-        setNotification({type: 'success', message: `An error are created while trying to update person: ${newPerson}.`})
+        setNotification({type: 'success', message: error.response.data.error })
       })
     }    
     setNewPerson({name:'', number:''})
