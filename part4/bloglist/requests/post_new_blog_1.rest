@@ -1,0 +1,9 @@
+POST http://localhost:3003/api/blogs/ HTTP/1.1
+content-type: application/json
+
+{
+  "title": "Fogonazos",
+  "author": "Antonio Martinez Ron",
+  "url": "http://www.fogonazos.es/",
+  "likes": 10
+}
