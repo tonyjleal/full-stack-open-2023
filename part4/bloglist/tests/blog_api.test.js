@@ -29,7 +29,21 @@ describe("when there is initially some blogs saved", () => {
 
         assert.strictEqual(blogs.length, helper.initialBlogs.length)
     })
-    
+
+    test('the unique identifier property is named id', async() => {
+        const blogsStart = await helper.blogsInDb()
+        const blogToView = blogsStart[0]
+        
+        const resultBlog = await api    
+                            .get(`/api/blogs/${blogToView.id}`)    
+                            .expect(200)    
+                            .expect('Content-Type', /application\/json/)
+                            
+        assert.equal(blogToView.id, resultBlog.body.id)
+
+    })
+
+
 })
 
 
